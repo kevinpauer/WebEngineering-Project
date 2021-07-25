@@ -41,7 +41,8 @@ function login() {
     }    
   }
 
-  username = "admin", password = "admin";
+  username = "admin";
+  password = "admin";
   http.send(`username=${username}&password=${password}`);
 }
 
