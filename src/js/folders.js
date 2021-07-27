@@ -1,43 +1,43 @@
 function getFolder(path, callback) {
+  let url = "http://localhost:8080/" + path;
 
-    let url = "http://localhost:8080/" + path;
+  let xhr = new XMLHttpRequest();
 
-    let xhr = new XMLHttpRequest();
+  xhr.open("GET", url);
+  xhr.setRequestHeader("Authorization", "Basic " + authCode);
 
-    xhr.open("GET", url);
-    xhr.setRequestHeader("Authorization", "Basic " + authCode);
-
-    xhr.onreadystatechange = function () {
-        if (xhr.readyState === 4){
-            console.log(xhr.status);
-            console.log(xhr.responseText);
-            if (xhr.status === 200){
-                callback(JSON.parse(xhr.responseText), path);
-            } else if(xhr.status === 401){
-                alert("Session Expired");
-                setupLogin();
-            }
-        }
+  xhr.onreadystatechange = function () {
+    if (xhr.readyState === 4) {
+      console.log(xhr.status);
+      console.log(xhr.responseText);
+      if (xhr.status === 200) {
+        callback(JSON.parse(xhr.responseText), path);
+      } else if (xhr.status === 401) {
+        alert("Session Expired");
+        setupLogin();
+      }
     }
-    xhr.send();
+  };
+  xhr.send();
 }
 
-function createFolder(path) {
-    let url = "http://localhost:8080/superfolder";
+function createFolder(folderName) {
+  var url = "http://localhost:8080/" + folderName;
 
-    let xhr = new XMLHttpRequest();
+  var xhr = new XMLHttpRequest();
+  xhr.open("POST", url);
 
-    xhr.open("GET", url);
+  xhr.setRequestHeader("Authorization", "Basic " + authCode);
+  xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
 
-    xhr.setRequestHeader("Authorization", "Basic" + authCode);
-    xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
-
-    xhr.onreadystatechange = function () {
-        if (xhr.readyState === 4) {
-            console.log(xhr.status);
-            console.log(xhr.responseText);
-        }
+  xhr.onreadystatechange = function () {
+    if (xhr.readyState === 4) {
+      console.log(xhr.status);
+      console.log(xhr.responseText);
     }
+  };
 
-    let data = "type-dir";
+  var data = "type=dir";
+
+  xhr.send(data);
 }

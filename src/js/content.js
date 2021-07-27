@@ -45,9 +45,11 @@ function setupFilesystem() {
 
   //Video
   let videoBox = document.createElement("video");
-  videoBox.height = 500;
-  videoBox.width = 200;
+  videoBox.height = 1000;
+  videoBox.width = 1000;
   videoBox.id = "videoBox";
+  videoBox.src = "";
+  videoBox.controls = "true";
   content.appendChild(videoBox);
   content.appendChild(document.createElement("br"));
 
@@ -56,6 +58,15 @@ function setupFilesystem() {
   picture.id = "picture";
   picture.src = "";
   content.appendChild(picture);
+  content.appendChild(document.createElement("br"));
+
+  //MP3
+  let audio = document.createElement("audio");
+  audio.id = "audio";
+  audio.autoplay = "autoplay";
+  audio.controls = "controls";
+  audio.src = "";
+  content.appendChild(audio);
 }
 function showDirectories(dir, path) {
   let filesystem = document.getElementById("filesystem");
@@ -102,6 +113,10 @@ function showDirectories(dir, path) {
         folder.addEventListener("click", function () {
           getFile(path, dir[key].Name, authCode, showPic);
         });
+      } else if (dir[key].Type === "audio/mpeg") {
+        folder.addEventListener("click", function () {
+          getFile(path, dir[key].Name, authCode, showSound);
+        });
       }
     }
   }
@@ -112,18 +127,21 @@ function showResponseText(response) {
   textBox.textContent = response;
 }
 
-function showVideo(videoBlob) {
-  console.log(videoBlob);
+function showVideo(response) {
+  console.log(response);
   let videoBox = document.getElementById("videoBox");
-  let source = document.createElement("source");
-  source.src = videoBlob;
-  videoBox.appendChild(source);
+  videoBox.src = "data:video/mp4;base64," + response;
 }
 
-function showPic(picBlob) {
-  console.log(picBlob);
+function showPic(response) {
   let picture = document.getElementById("picture");
-  picture.src = picBlob;
+  picture.src = "data:image/png;base64," + response;
+}
+
+function showSound(response) {
+  console.log(response);
+  let audio = document.getElementById("audio");
+  audio.src = "data:audio/mpeg;base64," + response;
 }
 
 function clearTextBox() {
