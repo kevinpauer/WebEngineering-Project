@@ -16,62 +16,26 @@ function setupFilesystem() {
 
   getFolder("", showDirectories);
 
-  //Input field for file upload
-  let fileUpload = document.createElement("input");
-  fileUpload.appendChild(document.createTextNode("Upload File"));
-  fileUpload.type = "file";
-  content.appendChild(fileUpload);
-  content.appendChild(document.createElement("br"));
+  //User options
+  let userOptions = document.createElement("div");
+  userOptions.id = "userOptions";
+  content.appendChild(userOptions);
 
-  //I dont know what this is?
-  let folderButton = document.createElement("button");
-  folderButton.appendChild(document.createTextNode("Get Folder"));
-  folderButton.onclick = getFolder;
-  content.appendChild(folderButton);
+  //SubContent from files
+  let subContent = document.createElement("div");
+  subContent.id = "subContent";
+  content.appendChild(subContent);
   content.appendChild(document.createElement("br"));
-
-  //TextBox to visualize .txt files
-  let textBox = document.createElement("textarea");
-  textBox.id = "textBox";
-  content.appendChild(textBox);
-  content.appendChild(document.createElement("br"));
-
-  //Button to clear up textBox
-  let clearButton = document.createElement("button");
-  clearButton.onclick = clearTextBox;
-  clearButton.appendChild(document.createTextNode("Clear"));
-  content.appendChild(clearButton);
-  content.appendChild(document.createElement("br"));
-
-  //Video
-  let videoBox = document.createElement("video");
-  videoBox.height = 1000;
-  videoBox.width = 1000;
-  videoBox.id = "videoBox";
-  videoBox.src = "";
-  videoBox.controls = "true";
-  content.appendChild(videoBox);
-  content.appendChild(document.createElement("br"));
-
-  //Picture
-  let picture = document.createElement("img");
-  picture.id = "picture";
-  picture.src = "";
-  content.appendChild(picture);
-  content.appendChild(document.createElement("br"));
-
-  //MP3
-  let audio = document.createElement("audio");
-  audio.id = "audio";
-  audio.autoplay = "autoplay";
-  audio.controls = "controls";
-  audio.src = "";
-  content.appendChild(audio);
 }
+
 function showDirectories(dir, path) {
   let filesystem = document.getElementById("filesystem");
-  filesystem.innerHTML = " ";
+  filesystem.innerHTML = "";
 
+  //Show user options
+  setUpUserOptions()
+
+  //Shows current dir to user
   let currentDir = document.createElement("label");
   let dirNames = path.split("/");
   console.log(dirNames);
@@ -79,7 +43,7 @@ function showDirectories(dir, path) {
     if (j === 0) {
       currentDir.textContent += "Main";
     } else {
-      currentDir.textContent += "->" + dirNames[j];
+      currentDir.textContent += "/" + dirNames[j];
     }
   }
   filesystem.appendChild(document.createElement("br"));
@@ -103,52 +67,113 @@ function showDirectories(dir, path) {
     } else {
       if (dir[key].Type === `text\/plain`) {
         folder.addEventListener("click", function () {
+          setUpTextView();
           getTextFile(path, dir[key].Name, authCode, showResponseText);
+          saveText(path, dir[key].Name);
+          deleteHelper(path, dir[key].Name)
         });
       } else if (dir[key].Type === "video/mp4") {
         folder.addEventListener("click", function () {
+          setUpVideoView();
           getFile(path, dir[key].Name, authCode, showVideo);
+          deleteHelper(path, dir[key].Name)
         });
       } else if (dir[key].Type === "image/png") {
         folder.addEventListener("click", function () {
+          setUpViewPicture()
           getFile(path, dir[key].Name, authCode, showPic);
+          deleteHelper(path, dir[key].Name)
         });
       } else if (dir[key].Type === "audio/mpeg") {
         folder.addEventListener("click", function () {
+          setUpViewMP3()
           getFile(path, dir[key].Name, authCode, showSound);
+          deleteHelper(path, dir[key].Name)
         });
+      } else {
+        folder.addEventListener("click", function () {
+          setUpUndefinedView(dir[key].Name);
+          deleteHelper(path, dir[key].Name)
+        })
       }
     }
   }
 }
 
+function setUpUserOptions() {
+  document.getElementById("userOptions").innerHTML = "";
+  let userOptions = document.getElementById("userOptions");
+
+  // //Input field for file upload
+  // let fileUpload = document.createElement("input");
+  // fileUpload.appendChild(document.createTextNode("Upload File"));
+  // fileUpload.type = "file";
+  // userOptions.appendChild(fileUpload);
+  // userOptions.appendChild(document.createElement("br"));
+
+  //Delete Folder
+  let folderDeleteButton = document.createElement("button");
+  folderDeleteButton.appendChild(document.createTextNode("Delete Folder"));
+  folderDeleteButton.id = "folderDeleteButton";
+  userOptions.appendChild(folderDeleteButton);
+  userOptions.appendChild(document.createElement("br"));
+
+  //I dont know what this is?
+  let folderButton = document.createElement("button");
+  folderButton.appendChild(document.createTextNode("Get Folder"));
+  folderButton.onclick = getFolder;
+  userOptions.appendChild(folderButton);
+  userOptions.appendChild(document.createElement("br"));
+
+  //Create .txt file
+  let fileCreateButton = document.createElement("button");
+  fileCreateButton.id = "fileCreateButton";
+  fileCreateButton.appendChild(document.createTextNode("Create Text-File"));
+  fileCreateButton.addEventListener("click", function (){
+    createTxtFileView("");
+  })
+  userOptions.appendChild(fileCreateButton);
+  userOptions.appendChild(document.createElement("br"));
+}
+
 function showResponseText(response) {
   let textBox = document.getElementById("textBox");
-  textBox.textContent = response;
+  textBox.value = response;
+  let downloadButton = document.getElementById("downloadButton");
+  downloadButton.setAttribute("href","data:text/plain;base64," + btoa(response));
+  downloadButton.setAttribute("download", "text")
 }
 
 function showVideo(response) {
-  console.log(response);
   let videoBox = document.getElementById("videoBox");
   videoBox.src = "data:video/mp4;base64," + response;
+  let downloadButton = document.getElementById("downloadButton");
+  downloadButton.setAttribute("href","data:video/mp4;base64," + response);
+  downloadButton.setAttribute("download", "text")
 }
 
 function showPic(response) {
   let picture = document.getElementById("picture");
   picture.src = "data:image/png;base64," + response;
+  let downloadButton = document.getElementById("downloadButton");
+  downloadButton.setAttribute("href","data:image/png;base64," + response);
+  downloadButton.setAttribute("download", "text")
 }
 
 function showSound(response) {
-  console.log(response);
   let audio = document.getElementById("audio");
   audio.src = "data:audio/mpeg;base64," + response;
+  let downloadButton = document.getElementById("downloadButton");
+  downloadButton.setAttribute("href","data:audio/mpeg;base64," + response);
+  downloadButton.setAttribute("download", "text")
 }
 
 function clearTextBox() {
-  document.getElementById("textBox").textContent = "";
+  document.getElementById("textBox").value = "";
 }
 
 function goBack(path) {
+  document.getElementById("subContent").innerHTML = "";
   document.getElementById("backButton").onclick = function () {
     getFolder(path, showDirectories);
     goBack(removeLastDirectoryPartOf(path));
@@ -163,4 +188,32 @@ function removeLastDirectoryPartOf(path) {
 
 function openFolder(path, folderName) {
   getFolder(`${path}/${folderName}`, showDirectories);
+
+  let deleteFolderButton = document.getElementById("folderDeleteButton");
+  deleteFolderButton.addEventListener("click", function () {
+    deleteFolder(`${path}/${folderName}`, authCode);
+  })
+}
+
+function saveText(path, fileName) {
+  let saveButton = document.getElementById("saveButton");
+  let textArea = document.getElementById("textBox");
+  saveButton.addEventListener("click", function () {
+    saveTextChanges(path, fileName, authCode, textArea.value);
+  });
+}
+
+function deleteHelper(path, fileName) {
+  let deleteButton = document.getElementById("deleteButton");
+  deleteButton.addEventListener("click", function () {
+    deleteFile(path, fileName, authCode)
+    document.getElementById("subContent").innerHTML = "";
+    getFolder(path, showDirectories);
+  })
+}
+
+function clear() {
+  document.getElementById("filesystem").innerHTML = "";
+  document.getElementById("subContent").innerHTML = "";
+  document.getElementById("userOptions").innerHTML = "";
 }

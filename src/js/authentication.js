@@ -65,7 +65,7 @@ function logout(){
 }
 
 function setupLogin(){
-  document.getElementById("content").innerHTML = " ";
+  document.getElementById("content").innerHTML = "";
 
   let loginHead = document.createElement("h3");
   loginHead.appendChild(document.createTextNode("login"));

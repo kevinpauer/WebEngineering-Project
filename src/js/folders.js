@@ -8,8 +8,6 @@ function getFolder(path, callback) {
 
   xhr.onreadystatechange = function () {
     if (xhr.readyState === 4) {
-      console.log(xhr.status);
-      console.log(xhr.responseText);
       if (xhr.status === 200) {
         callback(JSON.parse(xhr.responseText), path);
       } else if (xhr.status === 401) {
@@ -28,7 +26,6 @@ function createFolder(folderName) {
   xhr.open("POST", url);
 
   xhr.setRequestHeader("Authorization", "Basic " + authCode);
-  xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
 
   xhr.onreadystatechange = function () {
     if (xhr.readyState === 4) {
